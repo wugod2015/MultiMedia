@@ -8,9 +8,10 @@
         android:id="@+id/view_pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"/>
+        android:orientation="vertical" />
 
     <RelativeLayout
+        android:id="@+id/cb_check_layout"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_alignParentBottom="true"
@@ -26,8 +27,8 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_margin="2dp"
-            android:text="选中"
-            android:checked="true"/>
+            android:checked="true"
+            android:text="选中" />
     </RelativeLayout>
 
 </RelativeLayout>

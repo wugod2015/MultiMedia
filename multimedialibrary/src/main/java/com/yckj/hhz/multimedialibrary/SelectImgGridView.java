@@ -1,6 +1,7 @@
 package com.yckj.hhz.multimedialibrary;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
@@ -39,8 +40,8 @@ public class SelectImgGridView extends LinearLayout implements RecyclerView.Recy
     List<MediaBean> mediaBeans;
     int spanCount = 4;
     int maxCount;
-    boolean isMultiple = true;
-    boolean isCrop = true;
+    boolean isMultiple = false;
+    boolean isCrop = false;
 
     public SelectImgGridView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
@@ -99,6 +100,9 @@ public class SelectImgGridView extends LinearLayout implements RecyclerView.Recy
             rxGalleryFinal.openGallery();
         } else {
 
+            Intent intent = new Intent(context, ShowBigImgActivity.class);
+            intent.putExtra("MediaBean", mediaBeans.get(position));
+            context.startActivity(intent);
         }
     }
 }
