@@ -86,10 +86,6 @@ public class SelectImgGridView extends LinearLayout implements RecyclerView.Recy
 
     RxGalleryFinal rxGalleryFinal;
 
-    public RxGalleryFinal getRxGalleryFinal() {
-        return rxGalleryFinal;
-    }
-
     @Override
     public void onRecyclerViewItemClick(View view, int position) {
         if (rxGalleryFinal == null) {
@@ -134,14 +130,24 @@ public class SelectImgGridView extends LinearLayout implements RecyclerView.Recy
             /*Intent intent = new Intent(context, ShowBigImgActivity.class);
             intent.putExtra("MediaBean", mediaBeans.get(position));
             context.startActivity(intent);*/
-            /*Intent intent = new Intent(context, MediaActivity.class);
-            intent.putExtra("isShowSelected",true);
-            Bundle bundle = new Bundle();
-            bundle.putParcelable(MediaActivity.EXTRA_CONFIGURATION, rxGalleryFinal.configuration);
-            intent.putExtras(bundle);
-            intent.putExtra("PreviewPosition", position);
-            context.startActivity(intent);*/
         }
+    }
+
+    /**
+     * 获取选择的图片地址
+     *
+     * @return
+     */
+    public List<String> getSelectedPathList() {
+        List<String> pathList = new ArrayList<>();
+        for (MediaBean item : mediaBeans) {
+            pathList.add(item.getOriginalPath());
+        }
+        return pathList;
+    }
+
+    public List<MediaBean> getSelectedMediaBeanList() {
+        return mediaBeans;
     }
 
     public SelectImgListener getSelectImgListener() {

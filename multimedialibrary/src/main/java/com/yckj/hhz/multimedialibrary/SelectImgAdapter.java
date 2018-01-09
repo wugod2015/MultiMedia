@@ -51,14 +51,14 @@ public class SelectImgAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 }
             }
         });
-        viewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+        /*viewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
                 isShowDelete = !isShowDelete;
                 notifyDataSetChanged();
                 return true;
             }
-        });
+        });*/
         if (position == list.size()) {
             viewHolder.itemImg.setImageResource(R.drawable.btn_add_img_selector);
             viewHolder.deleteImg.setVisibility(View.GONE);
