@@ -20,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.yalantis.ucrop.UCropActivity;
+import com.yckj.hhz.multimedialibrary.R;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -29,7 +30,6 @@ import java.util.List;
 import java.util.Locale;
 
 import cn.finalteam.rxgalleryfinal.Configuration;
-import com.yckj.hhz.multimedialibrary.R;
 import cn.finalteam.rxgalleryfinal.anim.Animation;
 import cn.finalteam.rxgalleryfinal.anim.SlideInUnderneathAnimation;
 import cn.finalteam.rxgalleryfinal.anim.SlideOutUnderneathAnimation;
@@ -42,9 +42,9 @@ import cn.finalteam.rxgalleryfinal.rxbus.RxBusSubscriber;
 import cn.finalteam.rxgalleryfinal.rxbus.event.CloseMediaViewPageFragmentEvent;
 import cn.finalteam.rxgalleryfinal.rxbus.event.ImageRadioResultEvent;
 import cn.finalteam.rxgalleryfinal.rxbus.event.MediaCheckChangeEvent;
+import cn.finalteam.rxgalleryfinal.rxbus.event.OpenMediaPageFragmentEvent;
 import cn.finalteam.rxgalleryfinal.rxbus.event.OpenMediaPreviewFragmentEvent;
 import cn.finalteam.rxgalleryfinal.rxbus.event.RequestStorageReadAccessPermissionEvent;
-import cn.finalteam.rxgalleryfinal.rxbus.event.OpenMediaPageFragmentEvent;
 import cn.finalteam.rxgalleryfinal.ui.activity.MediaActivity;
 import cn.finalteam.rxgalleryfinal.ui.adapter.BucketAdapter;
 import cn.finalteam.rxgalleryfinal.ui.adapter.MediaGridAdapter;
@@ -61,11 +61,12 @@ import cn.finalteam.rxgalleryfinal.utils.MediaUtils;
 import cn.finalteam.rxgalleryfinal.utils.PermissionCheckUtils;
 import cn.finalteam.rxgalleryfinal.utils.ThemeUtils;
 import cn.finalteam.rxgalleryfinal.view.MediaGridView;
-import rx.Observable;
-import rx.Observer;
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
+import io.reactivex.Observable;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Desction:
@@ -73,7 +74,7 @@ import rx.schedulers.Schedulers;
  * Date:16/5/7 上午10:02
  */
 public class MediaGridFragment extends BaseFragment implements MediaGridView, RecyclerViewFinal.OnLoadMoreListener,
-        FooterAdapter.OnItemClickListener,View.OnClickListener, MediaScanner.ScanCallback, BucketAdapter.OnRecyclerViewItemClickListener {
+        FooterAdapter.OnItemClickListener, View.OnClickListener, MediaScanner.ScanCallback, BucketAdapter.OnRecyclerViewItemClickListener {
 
     private final String IMAGE_STORE_FILE_NAME = "IMG_%s.jpg";
     private final int TAKE_IMAGE_REQUEST_CODE = 1001;
@@ -107,9 +108,9 @@ public class MediaGridFragment extends BaseFragment implements MediaGridView, Re
     private String mBucketId = String.valueOf(Integer.MIN_VALUE);
 
     private MediaActivity mMediaActivity;
-    private Subscription mSubscrMediaCheckChangeEvent;
-    private Subscription mSubscrCloseMediaViewPageFragmentEvent;
-    private Subscription mSubscrRequestStorageReadAccessPermissionEvent;
+    private Disposable mSubscrMediaCheckChangeEvent;
+    private Disposable mSubscrCloseMediaViewPageFragmentEvent;
+    private Disposable mSubscrRequestStorageReadAccessPermissionEvent;
 
     public static MediaGridFragment newInstance(Configuration configuration) {
         MediaGridFragment fragment = new MediaGridFragment();
@@ -122,7 +123,7 @@ public class MediaGridFragment extends BaseFragment implements MediaGridView, Re
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if(context instanceof MediaActivity) {
+        if (context instanceof MediaActivity) {
             mMediaActivity = (MediaActivity) context;
         }
         mImageStoreDir = new File(Environment.getExternalStorageDirectory(), "/DCIM/RxGalleryFinal/");
@@ -159,7 +160,7 @@ public class MediaGridFragment extends BaseFragment implements MediaGridView, Re
         mTvPreview = (TextView) view.findViewById(R.id.tv_preview);
         mTvPreview.setOnClickListener(this);
         mTvPreview.setEnabled(false);
-        if(mConfiguration.isRadio()){
+        if (mConfiguration.isRadio()) {
             view.findViewById(R.id.tv_preview_vr).setVisibility(View.GONE);
             mTvPreview.setVisibility(View.GONE);
         }
@@ -196,7 +197,7 @@ public class MediaGridFragment extends BaseFragment implements MediaGridView, Re
         subscribeEvent();
 
         Activity activity = mMediaActivity;
-        if(activity == null){
+        if (activity == null) {
             activity = getActivity();
         }
 
@@ -205,17 +206,23 @@ public class MediaGridFragment extends BaseFragment implements MediaGridView, Re
                 R.string.gallery_default_request_storage_access_permission_tips);
         boolean success = PermissionCheckUtils.checkReadExternalPermission(activity, requestStorageAccessPermissionTips,
                 MediaActivity.REQUEST_STORAGE_READ_ACCESS_PERMISSION);
-        if(success) {
+        if (success) {
             mMediaGridPresenter.getMediaList(mBucketId, mPage, LIMIT);
         }
     }
 
     private void subscribeEvent() {
-        mSubscrMediaCheckChangeEvent = RxBus.getDefault().toObservable(MediaCheckChangeEvent.class)
+        RxBus.getDefault().toObservable(MediaCheckChangeEvent.class)
                 .subscribe(new RxBusSubscriber<MediaCheckChangeEvent>() {
                     @Override
+                    public void onSubscribe(Disposable d) {
+                        super.onSubscribe(d);
+                        mSubscrMediaCheckChangeEvent = d;
+                    }
+
+                    @Override
                     protected void onEvent(MediaCheckChangeEvent mediaCheckChangeEvent) {
-                        if(mMediaActivity.getCheckedList().size() == 0){
+                        if (mMediaActivity.getCheckedList().size() == 0) {
                             mTvPreview.setEnabled(false);
                         } else {
                             mTvPreview.setEnabled(true);
@@ -225,27 +232,39 @@ public class MediaGridFragment extends BaseFragment implements MediaGridView, Re
                 });
         RxBus.getDefault().add(mSubscrMediaCheckChangeEvent);
 
-        mSubscrCloseMediaViewPageFragmentEvent = RxBus.getDefault().toObservable(CloseMediaViewPageFragmentEvent.class)
+        RxBus.getDefault().toObservable(CloseMediaViewPageFragmentEvent.class)
                 .subscribe(new RxBusSubscriber<CloseMediaViewPageFragmentEvent>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        super.onSubscribe(d);
+                        mSubscrCloseMediaViewPageFragmentEvent = d;
+                        RxBus.getDefault().add(mSubscrCloseMediaViewPageFragmentEvent);
+                    }
+
                     @Override
                     protected void onEvent(CloseMediaViewPageFragmentEvent closeMediaViewPageFragmentEvent) throws Exception {
                         mMediaGridAdapter.notifyDataSetChanged();
                     }
                 });
-        RxBus.getDefault().add(mSubscrCloseMediaViewPageFragmentEvent);
 
-        mSubscrRequestStorageReadAccessPermissionEvent = RxBus.getDefault().toObservable(RequestStorageReadAccessPermissionEvent.class)
+        RxBus.getDefault().toObservable(RequestStorageReadAccessPermissionEvent.class)
                 .subscribe(new RxBusSubscriber<RequestStorageReadAccessPermissionEvent>() {
                     @Override
+                    public void onSubscribe(Disposable d) {
+                        super.onSubscribe(d);
+                        mSubscrRequestStorageReadAccessPermissionEvent = d;
+                        RxBus.getDefault().add(mSubscrRequestStorageReadAccessPermissionEvent);
+                    }
+
+                    @Override
                     protected void onEvent(RequestStorageReadAccessPermissionEvent requestStorageReadAccessPermissionEvent) throws Exception {
-                        if(requestStorageReadAccessPermissionEvent.isSuccess()){
+                        if (requestStorageReadAccessPermissionEvent.isSuccess()) {
                             mMediaGridPresenter.getMediaList(mBucketId, mPage, LIMIT);
                         } else {
                             getActivity().finish();
                         }
                     }
                 });
-        RxBus.getDefault().add(mSubscrRequestStorageReadAccessPermissionEvent);
 
     }
 
@@ -268,7 +287,7 @@ public class MediaGridFragment extends BaseFragment implements MediaGridView, Re
 
     @Override
     public void onRequestMediaCallback(List<MediaBean> list) {
-        if(!mConfiguration.isHideCamera()) {
+        if (!mConfiguration.isHideCamera()) {
             if (mPage == 1 && TextUtils.equals(mBucketId, String.valueOf(Integer.MIN_VALUE))) {
                 MediaBean takePhotoBean = new MediaBean();
                 takePhotoBean.setId(Integer.MIN_VALUE);
@@ -304,7 +323,7 @@ public class MediaGridFragment extends BaseFragment implements MediaGridView, Re
 
     @Override
     public void onRequestBucketCallback(List<BucketBean> list) {
-        if(list == null || list.size() == 0){
+        if (list == null || list.size() == 0) {
             return;
         }
 
@@ -318,7 +337,7 @@ public class MediaGridFragment extends BaseFragment implements MediaGridView, Re
         BucketBean bucketBean = mBucketBeanList.get(position);
         String bucketId = bucketBean.getBucketId();
         mRlBucektOverview.setVisibility(View.GONE);
-        if(TextUtils.equals(mBucketId, bucketId)){
+        if (TextUtils.equals(mBucketId, bucketId)) {
             return;
         }
         mBucketId = bucketId;
@@ -353,7 +372,7 @@ public class MediaGridFragment extends BaseFragment implements MediaGridView, Re
                 ArrayList<MediaBean> gridMediaList = new ArrayList<>();
                 gridMediaList.addAll(mMediaBeanList);
                 int pos = position;
-                if(firstBean.getId() == Integer.MIN_VALUE) {
+                if (firstBean.getId() == Integer.MIN_VALUE) {
                     pos = position - 1;
                     gridMediaList.clear();
                     List<MediaBean> list = mMediaBeanList.subList(1, mMediaBeanList.size());
@@ -365,7 +384,7 @@ public class MediaGridFragment extends BaseFragment implements MediaGridView, Re
     }
 
     private void radioNext(MediaBean mediaBean) {
-        if(!mConfiguration.isCrop()){
+        if (!mConfiguration.isCrop()) {
             ImageCropBean bean = new ImageCropBean();
             bean.copyMediaBean(mediaBean);
             RxBus.getDefault().post(new ImageRadioResultEvent(bean));
@@ -415,7 +434,7 @@ public class MediaGridFragment extends BaseFragment implements MediaGridView, Re
         if (!TextUtils.isEmpty(mImagePath)) {
             outState.putString(TAKE_URL_STORAGE_KEY, mImagePath);
         }
-        if(!TextUtils.isEmpty(mBucketId)) {
+        if (!TextUtils.isEmpty(mBucketId)) {
             outState.putString(BUCKET_ID_KEY, mBucketId);
         }
     }
@@ -449,12 +468,12 @@ public class MediaGridFragment extends BaseFragment implements MediaGridView, Re
     @Override
     public void onClick(View v) {
         int id = v.getId();
-        if(id == R.id.tv_preview) {
+        if (id == R.id.tv_preview) {
             RxBus.getDefault().post(new OpenMediaPreviewFragmentEvent());
-        } else if(id == R.id.tv_folder_name) {
+        } else if (id == R.id.tv_folder_name) {
             v.setEnabled(false);
             int visibility = mRlBucektOverview.getVisibility();
-            if(visibility == View.VISIBLE) {
+            if (visibility == View.VISIBLE) {
                 new SlideOutUnderneathAnimation(mRvBucket)
                         .setDirection(Animation.DIRECTION_DOWN)
                         .setDuration(Animation.DURATION_DEFAULT)
@@ -463,7 +482,7 @@ public class MediaGridFragment extends BaseFragment implements MediaGridView, Re
                             mRlBucektOverview.setVisibility(View.GONE);
                         })
                         .animate();
-            } else  {
+            } else {
                 mRlBucektOverview.setVisibility(View.VISIBLE);
                 new SlideInUnderneathAnimation(mRvBucket)
                         .setDirection(Animation.DIRECTION_DOWN)
@@ -478,38 +497,43 @@ public class MediaGridFragment extends BaseFragment implements MediaGridView, Re
 
     @Override
     public void onScanCompleted(String[] images) {
-        if(images == null || images.length == 0){
+        if (images == null || images.length == 0) {
             Logger.i("images empty");
             return;
         }
 
-        Observable.create((Observable.OnSubscribe<MediaBean>) subscriber -> {
+        Observable.create((ObservableOnSubscribe<MediaBean>) subscriber -> {
             MediaBean mediaBean = MediaUtils.getMediaBeanWithImage(getContext(), images[0]);
             subscriber.onNext(mediaBean);
-            subscriber.onCompleted();
+            subscriber.onComplete();
         })
-        .subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(new Observer<MediaBean>() {
-            @Override
-            public void onCompleted() {
-            }
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<MediaBean>() {
+                    @Override
+                    public void onComplete() {
+                    }
 
-            @Override
-            public void onError(Throwable e) {
-                Logger.i("获取MediaBean异常");
-            }
+                    @Override
+                    public void onError(Throwable e) {
+                        Logger.i("获取MediaBean异常");
+                    }
 
-            @Override
-            public void onNext(MediaBean mediaBean) {
+                    @Override
+                    public void onSubscribe(Disposable d) {
 
-                if(!isDetached() && mediaBean != null) {
-                    mMediaBeanList.add(1, mediaBean);
-                    mMediaGridAdapter.notifyDataSetChanged();
-                }
+                    }
 
-            }
-        });
+                    @Override
+                    public void onNext(MediaBean mediaBean) {
+
+                        if (!isDetached() && mediaBean != null) {
+                            mMediaBeanList.add(1, mediaBean);
+                            mMediaGridAdapter.notifyDataSetChanged();
+                        }
+
+                    }
+                });
     }
 
     @Override

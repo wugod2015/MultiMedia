@@ -3,11 +3,14 @@ package cn.finalteam.rxgalleryfinal.rxjob;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import rx.Observable;
-import rx.Observer;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+
 
 /**
  * Desction:
@@ -31,43 +34,52 @@ public class JobManager {
             } else {
                 jobQueue.offer(job);
             }
-        }catch (Exception e){}
+        } catch (Exception e) {
+        }
 
     }
 
     private void start() {
-        Observable.create(new Observable.OnSubscribe<Job>() {
+        Observable.create(new ObservableOnSubscribe<Job>() {
             @Override
-            public void call(Subscriber<? super Job> subscriber) {
+            public void subscribe(ObservableEmitter<Job> e) throws Exception {
                 queueFree = false;
                 Job job;
-                while ((job = jobQueue.poll()) != null){
+                while ((job = jobQueue.poll()) != null) {
                     job.onRunJob();
                 }
-                subscriber.onCompleted();
+                e.onComplete();
             }
+
         })
-        .subscribeOn(Schedulers.newThread())
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(new Observer<Job>() {
-            @Override
-            public void onCompleted() {
-                queueFree = true;
-            }
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<Job>() {
+                    @Override
+                    public void onComplete() {
+                        queueFree = true;
+                    }
 
-            @Override
-            public void onError(Throwable e) {
-            }
+                    @Override
+                    public void onError(Throwable e) {
+                    }
 
-            @Override
-            public void onNext(Job job) {
-            }
-        });
+
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(Job job) {
+                    }
+                });
     }
 
     public void clear() {
         try {
             jobQueue.clear();
-        }catch (Exception e){}
+        } catch (Exception e) {
+        }
     }
 }

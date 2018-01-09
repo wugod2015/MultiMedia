@@ -24,7 +24,7 @@ import cn.finalteam.rxgalleryfinal.rxbus.event.ImageMultipleResultEvent;
 import cn.finalteam.rxgalleryfinal.rxbus.event.ImageRadioResultEvent;
 import cn.finalteam.rxgalleryfinal.ui.activity.MediaActivity;
 import cn.finalteam.rxgalleryfinal.utils.StorageUtils;
-import rx.Subscription;
+import io.reactivex.disposables.Disposable;
 
 /**
  * Desction:
@@ -272,6 +272,7 @@ public class RxGalleryFinal {
 
     /**
      * 展示已选择的
+     *
      * @param position
      */
     public void openGallery(int position) {
@@ -296,17 +297,21 @@ public class RxGalleryFinal {
             return;
         }
 
-        Subscription subscription;
+        Disposable disposable;
         if (configuration.isRadio()) {
-            subscription = RxBus.getDefault()
+            /*disposable =*/
+            RxBus.getDefault()
                     .toObservable(ImageRadioResultEvent.class)
                     .subscribe(rxBusResultSubscriber);
+            disposable = rxBusResultSubscriber.disposable;
         } else {
-            subscription = RxBus.getDefault()
+           /* disposable =*/
+            RxBus.getDefault()
                     .toObservable(ImageMultipleResultEvent.class)
                     .subscribe(rxBusResultSubscriber);
+            disposable = rxBusResultSubscriber.disposable;
         }
-        RxBus.getDefault().add(subscription);
+        RxBus.getDefault().add(disposable);
 
         Intent intent = new Intent(context, MediaActivity.class);
         if (position > -1) {
