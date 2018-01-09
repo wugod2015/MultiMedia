@@ -1,0 +1,5 @@
+app:is_crop="true" 是否裁剪，仅支持单张
+
+app:span_count="3" 每行张数
+
+app:max_count="6" 最大张数
