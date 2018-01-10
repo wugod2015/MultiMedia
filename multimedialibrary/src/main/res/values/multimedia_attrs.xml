@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="SelectImgGridView">
+    <declare-styleable name="SelectImgRecyclerView">
         <attr name="is_crop" format="boolean" />
         <attr name="max_count" format="integer" />
         <attr name="span_count" format="integer" />

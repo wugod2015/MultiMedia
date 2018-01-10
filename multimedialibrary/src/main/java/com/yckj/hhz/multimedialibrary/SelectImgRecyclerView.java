@@ -2,6 +2,8 @@ package com.yckj.hhz.multimedialibrary;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,26 +23,27 @@ import cn.finalteam.rxgalleryfinal.rxbus.event.ImageRadioResultEvent;
  * Created by Administrator on 2016/12/4 0004.
  */
 
-public class SelectImgGridView extends LinearLayout implements SelectImgAdapter.OnGridViewItemClickListener {
-    public SelectImgGridView(Context context) {
+public class SelectImgRecyclerView extends LinearLayout implements RecyclerView.RecyclerListener, SelectImgRecyclerAdapter.OnRecyclerViewItemClickListener {
+    public SelectImgRecyclerView(Context context) {
         this(context, null);
     }
 
-    public SelectImgGridView(Context context, AttributeSet attrs) {
+    public SelectImgRecyclerView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
     Context context;
 
-    MyGridView myGridView;
-    SelectImgAdapter selectImgAdapter;
+    RecyclerView recyclerView;
+    GridLayoutManager gridLayoutManager;
+    SelectImgRecyclerAdapter selectImgRecyclerAdapter;
     ArrayList<MediaBean> mediaBeans;
     int spanCount = 4;
     int maxCount = 1;
     boolean isMultiple = false;
     boolean isCrop = false;
 
-    public SelectImgGridView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public SelectImgRecyclerView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         this.context = context;
         TypedArray typedArray = context.getTheme().obtainStyledAttributes(attrs, R.styleable.SelectImgRecyclerView, defStyleAttr, 0);
@@ -58,23 +61,30 @@ public class SelectImgGridView extends LinearLayout implements SelectImgAdapter.
 
         }
 
-        LayoutInflater.from(context).inflate(R.layout.layout_select_img_gridview, this, true);
-        myGridView = (MyGridView) findViewById(R.id.myGridView);
-        myGridView.setNumColumns(spanCount);
+        LayoutInflater.from(context).inflate(R.layout.layout_select_img_recyclerview, this, true);
+        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        gridLayoutManager = new GridLayoutManager(context, spanCount);
+        recyclerView.setLayoutManager(gridLayoutManager);
+        recyclerView.setHasFixedSize(true);
         mediaBeans = new ArrayList<>();
         maxCount = maxCount == 0 ? spanCount * spanCount : maxCount;
         if (maxCount > 1) {
             isMultiple = true;
         }
-        selectImgAdapter = new SelectImgAdapter(context, mediaBeans, spanCount, maxCount);
-        myGridView.setAdapter(selectImgAdapter);
-        selectImgAdapter.setOnGridViewItemClickListener(this);
+        selectImgRecyclerAdapter = new SelectImgRecyclerAdapter(context, mediaBeans, spanCount, maxCount);
+        recyclerView.setAdapter(selectImgRecyclerAdapter);
+        selectImgRecyclerAdapter.setOnRecyclerViewItemClickListener(this);
+    }
+
+    @Override
+    public void onViewRecycled(RecyclerView.ViewHolder holder) {
+
     }
 
     RxGalleryFinal rxGalleryFinal;
 
     @Override
-    public void onGridViewItemClick(View view, int position) {
+    public void onRecyclerViewItemClick(View view, int position) {
         if (rxGalleryFinal == null) {
             rxGalleryFinal = RxGalleryFinal
                     .with(context)
@@ -94,7 +104,7 @@ public class SelectImgGridView extends LinearLayout implements SelectImgAdapter.
                         protected void onEvent(ImageMultipleResultEvent resultEvent) throws Exception {
                             mediaBeans.clear();
                             mediaBeans.addAll(resultEvent.getResult());
-                            selectImgAdapter.notifyDataSetChanged();
+                            selectImgRecyclerAdapter.notifyDataSetChanged();
 
                             selectImgListener.onMultipleResult(resultEvent);
                         }
@@ -103,9 +113,8 @@ public class SelectImgGridView extends LinearLayout implements SelectImgAdapter.
             rxGalleryFinal.subscribe(new RxBusResultSubscriber<ImageRadioResultEvent>() {
                 @Override
                 protected void onEvent(ImageRadioResultEvent resultEvent) throws Exception {
-                    mediaBeans.clear();
                     mediaBeans.add(resultEvent.getResult());
-                    selectImgAdapter.notifyDataSetChanged();
+                    selectImgRecyclerAdapter.notifyDataSetChanged();
                     if (selectImgListener != null) {
                         selectImgListener.onOneResult(resultEvent);
                     }
@@ -142,9 +151,6 @@ public class SelectImgGridView extends LinearLayout implements SelectImgAdapter.
         return selectImgListener;
     }
 
-    /**
-     * @param selectImgListener
-     */
     public void setSelectImgListener(SelectImgListener selectImgListener) {
         this.selectImgListener = selectImgListener;
     }

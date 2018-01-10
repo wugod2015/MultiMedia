@@ -3,3 +3,27 @@ app:is_crop="true" 是否裁剪，仅支持单张
 app:span_count="3" 每行张数
 
 app:max_count="6" 最大张数
+
+如：
+<com.yckj.hhz.multimedialibrary.SelectImgGridView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:span_count="4"
+        app:max_count="12">
+</com.yckj.hhz.multimedialibrary.SelectImgGridView>
+
+getSelectedPathList() 获取图片地址列表
+getSelectedMediaBeanList() 获取图片bean列表
+
+监听：
+selectImgGridView.setSelectImgListener(new SelectImgGridView.SelectImgListener() {
+            @Override
+            public void onOneResult(ImageRadioResultEvent resultEvent) {
+            //单张图片情况
+            }
+
+            @Override
+            public void onMultipleResult(ImageMultipleResultEvent resultEvent) {
+            //多张图片情况
+            }
+        });

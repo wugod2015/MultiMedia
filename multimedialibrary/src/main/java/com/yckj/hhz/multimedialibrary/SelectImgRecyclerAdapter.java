@@ -5,9 +5,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.RelativeLayout;
 
 import com.bumptech.glide.Glide;
 
@@ -19,8 +18,8 @@ import cn.finalteam.rxgalleryfinal.bean.MediaBean;
  * Created by Administrator on 2016/12/4 0004.
  */
 
-public class SelectImgAdapter extends BaseAdapter {
-    final static String TAG = "SelectImgAdapter";
+public class SelectImgRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    final static String TAG = "SelectImgRecyclerAdapter";
 
     public Context context;
     public List<MediaBean> list;
@@ -28,7 +27,7 @@ public class SelectImgAdapter extends BaseAdapter {
     int maxCount;
     boolean isShowDelete = false;
 
-    public SelectImgAdapter(Context context, List<MediaBean> list, int spanCount, int maxCount) {
+    public SelectImgRecyclerAdapter(Context context, List<MediaBean> list, int spanCount, int maxCount) {
         this.context = context;
         this.list = list;
         this.spanCount = spanCount;
@@ -36,38 +35,19 @@ public class SelectImgAdapter extends BaseAdapter {
     }
 
     @Override
-    public int getCount() {
-        return list.size() < maxCount ? list.size() + 1 : list.size();
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        int h = parent.getMeasuredWidth();
+        return new ViewHolder(LayoutInflater.from(context).inflate(R.layout.layout_select_img_item, null), h);
     }
 
     @Override
-    public Object getItem(int position) {
-        return position < list.size() ? list.get(position) : null;
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return position;
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        View view = convertView;
-        ViewHolder viewHolder = null;
-        if (convertView == null) {
-            view = LayoutInflater.from(context)
-                    .inflate(R.layout.layout_select_img_item, null);
-            int h = parent.getMeasuredWidth();
-            viewHolder = new ViewHolder(view, h);
-            view.setTag(viewHolder);
-        } else {
-            viewHolder = (ViewHolder) view.getTag();
-        }
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
+        ViewHolder viewHolder = (ViewHolder) holder;
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mOnItemClickListener != null) {
-                    mOnItemClickListener.onGridViewItemClick(v, position);
+                    mOnItemClickListener.onRecyclerViewItemClick(v, position);
                 }
             }
         });
@@ -82,7 +62,7 @@ public class SelectImgAdapter extends BaseAdapter {
         if (position == list.size()) {
             viewHolder.itemImg.setImageResource(R.drawable.btn_add_img_selector);
             viewHolder.deleteImg.setVisibility(View.GONE);
-            return view;
+            return;
         }
         final MediaBean item = list.get(position);
         Glide.with(context).load(item.getOriginalPath()).into(viewHolder.itemImg);
@@ -95,26 +75,29 @@ public class SelectImgAdapter extends BaseAdapter {
             }
         });
 
-        return view;
     }
 
-    public interface OnGridViewItemClickListener {
-        void onGridViewItemClick(View view, int position);
+    @Override
+    public int getItemCount() {
+        return list.size() < maxCount ? list.size() + 1 : list.size();
     }
 
-    private OnGridViewItemClickListener mOnItemClickListener = null;
+    public static interface OnRecyclerViewItemClickListener {
+        void onRecyclerViewItemClick(View view, int position);
+    }
 
-    public void setOnGridViewItemClickListener(OnGridViewItemClickListener listener) {
+    private OnRecyclerViewItemClickListener mOnItemClickListener = null;
+
+    public void setOnRecyclerViewItemClickListener(OnRecyclerViewItemClickListener listener) {
         this.mOnItemClickListener = listener;
     }
 
-    class ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder {
         ImageView itemImg;
         ImageView deleteImg;
-        View itemView;
 
         public ViewHolder(View itemView, int h) {
-            this.itemView = itemView;
+            super(itemView);
             itemImg = (ImageView) itemView.findViewById(R.id.itemImg);
             deleteImg = (ImageView) itemView.findViewById(R.id.deleteImg);
             ViewGroup.LayoutParams layoutParams = itemImg.getLayoutParams();
