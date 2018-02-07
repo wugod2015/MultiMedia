@@ -82,19 +82,18 @@ public class SelectImgAdapter extends BaseAdapter {
         if (position == list.size()) {
             viewHolder.itemImg.setImageResource(R.drawable.btn_add_img_selector);
             viewHolder.deleteImg.setVisibility(View.GONE);
-            return view;
+        } else {
+            final MediaBean item = list.get(position);
+            Glide.with(context).load(item.getOriginalPath()).into(viewHolder.itemImg);
+            viewHolder.deleteImg.setVisibility(isShowDelete ? View.VISIBLE : View.GONE);
+            viewHolder.deleteImg.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    list.remove(position);
+                    notifyDataSetChanged();
+                }
+            });
         }
-        final MediaBean item = list.get(position);
-        Glide.with(context).load(item.getOriginalPath()).into(viewHolder.itemImg);
-        viewHolder.deleteImg.setVisibility(isShowDelete ? View.VISIBLE : View.GONE);
-        viewHolder.deleteImg.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                list.remove(position);
-                notifyDataSetChanged();
-            }
-        });
-
         return view;
     }
 
