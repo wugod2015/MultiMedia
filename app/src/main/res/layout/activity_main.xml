@@ -1,20 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_main"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.bluearchitect.jackhan.multimedia.MainActivity">
+    android:layout_height="match_parent">
 
-
-    <com.yckj.hhz.multimedialibrary.SelectImgGridView
-        android:id="@+id/selectImgGridView"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:is_crop="true"
-        app:max_count="12"
-        app:span_count="4">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    </com.yckj.hhz.multimedialibrary.SelectImgGridView>
-</RelativeLayout>
+        <com.yckj.hhz.multimedialibrary.SelectImgGridView3
+            android:id="@+id/selectImgGridView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:is_crop="true"
+            app:max_count="12"
+            app:span_count="4">
+
+        </com.yckj.hhz.multimedialibrary.SelectImgGridView3>
+    </LinearLayout>
+</LinearLayout>
