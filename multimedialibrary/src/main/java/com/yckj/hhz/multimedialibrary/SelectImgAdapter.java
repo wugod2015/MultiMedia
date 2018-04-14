@@ -57,8 +57,7 @@ public class SelectImgAdapter extends BaseAdapter {
         if (convertView == null) {
             view = LayoutInflater.from(context)
                     .inflate(R.layout.layout_select_img_item, null);
-            int h = parent.getMeasuredWidth();
-            viewHolder = new ViewHolder(view, h);
+            viewHolder = new ViewHolder(view);
             view.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) view.getTag();
@@ -80,11 +79,13 @@ public class SelectImgAdapter extends BaseAdapter {
             }
         });*/
         if (position == list.size()) {
+
+            //Glide.with(context).load(R.drawable.btn_add_img_selector).into(viewHolder.itemImg);
             viewHolder.itemImg.setImageResource(R.drawable.btn_add_img_selector);
             viewHolder.deleteImg.setVisibility(View.GONE);
         } else {
             final MediaBean item = list.get(position);
-            Glide.with(context).load(item.getOriginalPath()).into(viewHolder.itemImg);
+            Glide.with(context).load(item.getOriginalPath()).error(R.drawable.pic_no_default).into(viewHolder.itemImg);
             viewHolder.deleteImg.setVisibility(isShowDelete ? View.VISIBLE : View.GONE);
             viewHolder.deleteImg.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -112,14 +113,10 @@ public class SelectImgAdapter extends BaseAdapter {
         ImageView deleteImg;
         View itemView;
 
-        public ViewHolder(View itemView, int h) {
+        public ViewHolder(View itemView) {
             this.itemView = itemView;
             itemImg = (ImageView) itemView.findViewById(R.id.itemImg);
             deleteImg = (ImageView) itemView.findViewById(R.id.deleteImg);
-            ViewGroup.LayoutParams layoutParams = itemImg.getLayoutParams();
-            layoutParams.height = h / spanCount;
-            layoutParams.width = h / spanCount;
-            itemImg.setLayoutParams(layoutParams);
         }
 
     }

@@ -77,7 +77,7 @@ public class SelectImgGridView1 extends GridView implements SelectImgAdapter.OnG
         selectImgAdapter.setOnGridViewItemClickListener(this);
     }
 
-    @Override
+    /*@Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         //super.onLayout(changed, l, t, r, b);
         int count = getChildCount();
@@ -106,34 +106,34 @@ public class SelectImgGridView1 extends GridView implements SelectImgAdapter.OnG
                 }
                 left = j * gridW;
 
-                /**
+                *//**
                  * If the current layout is not the same width and width
                  * measurements, the direct use of re-measuring the width of the
                  * current layout
-                 */
+                 *//*
                 if (gridW != child.getMeasuredWidth()
                         || gridH != child.getMeasuredHeight()) {
                     child.measure(makeMeasureSpec(gridW, EXACTLY),
                             makeMeasureSpec(gridH, EXACTLY));
                 }
-                /**
+                *//**
                  * set current child view layout
-                 */
+                 *//*
                 child.layout(left, top, left + gridW, top + gridH);
             }
             top += gridH; // next rows
         }
 
-    }
+    }*/
 
-    /* @Override
+     @Override
     public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int expandSpec = MeasureSpec.makeMeasureSpec(Integer.MAX_VALUE >> 2,
                 MeasureSpec.AT_MOST);
         super.onMeasure(widthMeasureSpec, expandSpec);
-    }*/
+    }
 
-    @Override
+  /*  @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec); //遍历子View，测量每个View的大小
         int widthMode = MeasureSpec.getMode(widthMeasureSpec);
@@ -146,7 +146,7 @@ public class SelectImgGridView1 extends GridView implements SelectImgAdapter.OnG
         int size = mediaBeans == null ? 0 : mediaBeans.size();
         int column = (size == maxCount) ? (maxCount / spanCount + maxCount % spanCount) : ((size + 1) / spanCount + (size + 1) % spanCount);
         setMeasuredDimension(widthSize, widthSize / spanCount * column);
-    }
+    }*/
 
     RxGalleryFinal rxGalleryFinal;
 
