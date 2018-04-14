@@ -9,7 +9,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <com.yckj.hhz.multimedialibrary.SelectImgGridView1
+        <com.yckj.hhz.multimedialibrary.SelectImgGridView
             android:id="@+id/selectImgGridView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -17,6 +17,13 @@
             app:max_count="12"
             app:span_count="4">
 
-        </com.yckj.hhz.multimedialibrary.SelectImgGridView1>
+        </com.yckj.hhz.multimedialibrary.SelectImgGridView>
+
+        <com.yckj.hhz.multimedialibrary.SelectImgRecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:is_crop="true"
+            app:max_count="12"
+            app:span_count="4"></com.yckj.hhz.multimedialibrary.SelectImgRecyclerView>
     </LinearLayout>
 </ScrollView>
