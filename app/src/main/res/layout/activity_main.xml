@@ -14,7 +14,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:is_crop="true"
-            app:max_count="12"
             app:span_count="4">
 
         </com.yckj.hhz.multimedialibrary.SelectImgGridView>

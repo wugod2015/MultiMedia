@@ -66,9 +66,48 @@ public class SelectImgGridView extends LinearLayout implements SelectImgAdapter.
         if (maxCount > 1) {
             isMultiple = true;
         }
+        setSelectImgView();
+    }
+
+    public void setSelectImgView() {
         selectImgAdapter = new SelectImgAdapter(context, mediaBeans, spanCount, maxCount);
         myGridView.setAdapter(selectImgAdapter);
         selectImgAdapter.setOnGridViewItemClickListener(this);
+    }
+
+    /**
+     * 最大选择数量
+     *
+     * @param maxCount
+     */
+    public void setMaxCount(int maxCount) {
+        this.maxCount = maxCount;
+        if (maxCount > 1) {
+            isMultiple = true;
+        }
+        setSelectImgView();
+    }
+
+    /**
+     * 每行列数
+     *
+     * @param spanCount
+     */
+    public void setSpanCount(int spanCount) {
+        this.spanCount = spanCount;
+        myGridView.setNumColumns(spanCount);
+        maxCount = maxCount == 0 ? spanCount * spanCount : maxCount;
+
+        setSelectImgView();
+    }
+
+    /**
+     * 是否剪裁图片
+     *
+     * @param isCrop
+     */
+    public void setIsCrop(boolean isCrop) {
+        this.isCrop = isCrop;
     }
 
     RxGalleryFinal rxGalleryFinal;

@@ -13,8 +13,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        /*selectImgGridView = (SelectImgGridView) findViewById(R.id.selectImgGridView);
-        selectImgGridView.init();
+        selectImgGridView = (SelectImgGridView) findViewById(R.id.selectImgGridView);
+        selectImgGridView.setMaxCount(12);
+        /*selectImgGridView.init();
         selectImgGridView.getSelectedPathList();
         selectImgGridView.setSelectImgListener(new SelectImgGridView.SelectImgListener() {
             @Override

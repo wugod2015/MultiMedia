@@ -74,6 +74,50 @@ public class SelectImgRecyclerView extends LinearLayout implements RecyclerView.
         selectImgRecyclerAdapter = new SelectImgRecyclerAdapter(context, mediaBeans, spanCount, maxCount);
         recyclerView.setAdapter(selectImgRecyclerAdapter);
         selectImgRecyclerAdapter.setOnRecyclerViewItemClickListener(this);
+        setSelectImgView();
+    }
+
+    public void setSelectImgView() {
+        selectImgRecyclerAdapter = new SelectImgRecyclerAdapter(context, mediaBeans, spanCount, maxCount);
+        recyclerView.setAdapter(selectImgRecyclerAdapter);
+        selectImgRecyclerAdapter.setOnRecyclerViewItemClickListener(this);
+    }
+
+    /**
+     * 最大选择数量
+     *
+     * @param maxCount
+     */
+    public void setMaxCount(int maxCount) {
+        this.maxCount = maxCount;
+        if (maxCount > 1) {
+            isMultiple = true;
+        }
+        setSelectImgView();
+    }
+
+    /**
+     * 每行列数
+     *
+     * @param spanCount
+     */
+    public void setSpanCount(int spanCount) {
+        this.spanCount = spanCount;
+        gridLayoutManager = new GridLayoutManager(context, spanCount);
+        recyclerView.setLayoutManager(gridLayoutManager);
+        recyclerView.setHasFixedSize(true);
+        maxCount = maxCount == 0 ? spanCount * spanCount : maxCount;
+
+        setSelectImgView();
+    }
+
+    /**
+     * 是否剪裁图片
+     *
+     * @param isCrop
+     */
+    public void setIsCrop(boolean isCrop) {
+        this.isCrop = isCrop;
     }
 
     @Override

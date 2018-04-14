@@ -70,6 +70,7 @@ public class SelectImgAdapter extends BaseAdapter {
                 }
             }
         });
+        int max=maxCount;
         /*viewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
