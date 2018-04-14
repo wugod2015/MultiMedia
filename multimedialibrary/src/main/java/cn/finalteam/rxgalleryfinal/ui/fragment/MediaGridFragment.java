@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.support.v4.content.FileProvider;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -20,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.yalantis.ucrop.UCropActivity;
+import com.yckj.hhz.multimedialibrary.BuildConfig;
 import com.yckj.hhz.multimedialibrary.R;
 
 import java.io.File;
@@ -409,7 +411,8 @@ public class MediaGridFragment extends BaseFragment implements MediaGridView, Re
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss", Locale.CHINA);
             String filename = String.format(IMAGE_STORE_FILE_NAME, dateFormat.format(new Date()));
             mImagePath = new File(mImageStoreDir, filename).getAbsolutePath();
-            captureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(mImagePath)));
+            String packageName = getActivity().getPackageName();
+            captureIntent.putExtra(MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(getActivity(), packageName + ".provider", new File(mImagePath)));  //Uri.fromFile(new File(mImagePath)));
             startActivityForResult(captureIntent, TAKE_IMAGE_REQUEST_CODE);
         } else {
             Toast.makeText(getContext(), R.string.gallery_device_camera_unable, Toast.LENGTH_SHORT).show();

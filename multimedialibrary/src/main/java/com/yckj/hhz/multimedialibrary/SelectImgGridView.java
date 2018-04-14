@@ -37,7 +37,6 @@ public class SelectImgGridView extends LinearLayout implements SelectImgAdapter.
     ArrayList<MediaBean> mediaBeans;
     int spanCount = 4;
     int maxCount = 1;
-    boolean isMultiple = false;
     boolean isCrop = false;
 
     public SelectImgGridView(Context context, AttributeSet attrs, int defStyleAttr) {
@@ -63,9 +62,6 @@ public class SelectImgGridView extends LinearLayout implements SelectImgAdapter.
         myGridView.setNumColumns(spanCount);
         mediaBeans = new ArrayList<>();
         maxCount = maxCount == 0 ? spanCount * spanCount : maxCount;
-        if (maxCount > 1) {
-            isMultiple = true;
-        }
         setSelectImgView();
     }
 
@@ -82,9 +78,6 @@ public class SelectImgGridView extends LinearLayout implements SelectImgAdapter.
      */
     public void setMaxCount(int maxCount) {
         this.maxCount = maxCount;
-        if (maxCount > 1) {
-            isMultiple = true;
-        }
         setSelectImgView();
     }
 
@@ -119,12 +112,12 @@ public class SelectImgGridView extends LinearLayout implements SelectImgAdapter.
                     .with(context)
                     .image()
                     .radio()
-                    .imageLoader(ImageLoaderType.GLIDE)
-                    .selected(mediaBeans);
+                    .imageLoader(ImageLoaderType.GLIDE);
             if (isCrop)
                 rxGalleryFinal.crop();
         }
-        if (isMultiple)
+        if (maxCount > 1) {
+            rxGalleryFinal.selected(mediaBeans);
             rxGalleryFinal.maxSize(maxCount)
                     .multiple()
                     .subscribe(new RxBusResultSubscriber<ImageMultipleResultEvent>() {
@@ -138,7 +131,7 @@ public class SelectImgGridView extends LinearLayout implements SelectImgAdapter.
                             selectImgListener.onMultipleResult(resultEvent);
                         }
                     });
-        else
+        } else {
             rxGalleryFinal.subscribe(new RxBusResultSubscriber<ImageRadioResultEvent>() {
                 @Override
                 protected void onEvent(ImageRadioResultEvent resultEvent) throws Exception {
@@ -150,7 +143,8 @@ public class SelectImgGridView extends LinearLayout implements SelectImgAdapter.
                     }
                 }
             });
-        if (position == mediaBeans.size()) {
+        }
+        if (position == mediaBeans.size() || (position == 0 && maxCount == 1)) {
             rxGalleryFinal.openGallery();
         } else {
             rxGalleryFinal.openGallery(position);

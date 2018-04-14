@@ -40,7 +40,6 @@ public class SelectImgRecyclerView extends LinearLayout implements RecyclerView.
     ArrayList<MediaBean> mediaBeans;
     int spanCount = 4;
     int maxCount = 1;
-    boolean isMultiple = false;
     boolean isCrop = false;
 
     public SelectImgRecyclerView(Context context, AttributeSet attrs, int defStyleAttr) {
@@ -68,9 +67,7 @@ public class SelectImgRecyclerView extends LinearLayout implements RecyclerView.
         recyclerView.setHasFixedSize(true);
         mediaBeans = new ArrayList<>();
         maxCount = maxCount == 0 ? spanCount * spanCount : maxCount;
-        if (maxCount > 1) {
-            isMultiple = true;
-        }
+
         selectImgRecyclerAdapter = new SelectImgRecyclerAdapter(context, mediaBeans, spanCount, maxCount);
         recyclerView.setAdapter(selectImgRecyclerAdapter);
         selectImgRecyclerAdapter.setOnRecyclerViewItemClickListener(this);
@@ -90,9 +87,6 @@ public class SelectImgRecyclerView extends LinearLayout implements RecyclerView.
      */
     public void setMaxCount(int maxCount) {
         this.maxCount = maxCount;
-        if (maxCount > 1) {
-            isMultiple = true;
-        }
         setSelectImgView();
     }
 
@@ -134,12 +128,12 @@ public class SelectImgRecyclerView extends LinearLayout implements RecyclerView.
                     .with(context)
                     .image()
                     .radio()
-                    .imageLoader(ImageLoaderType.GLIDE)
-                    .selected(mediaBeans);
+                    .imageLoader(ImageLoaderType.GLIDE);
             if (isCrop)
                 rxGalleryFinal.crop();
         }
-        if (isMultiple)
+        if (maxCount > 1) {
+            rxGalleryFinal.selected(mediaBeans);
             rxGalleryFinal.maxSize(maxCount)
                     .multiple()
                     .subscribe(new RxBusResultSubscriber<ImageMultipleResultEvent>() {
@@ -153,10 +147,11 @@ public class SelectImgRecyclerView extends LinearLayout implements RecyclerView.
                             selectImgListener.onMultipleResult(resultEvent);
                         }
                     });
-        else
+        } else {
             rxGalleryFinal.subscribe(new RxBusResultSubscriber<ImageRadioResultEvent>() {
                 @Override
                 protected void onEvent(ImageRadioResultEvent resultEvent) throws Exception {
+                    mediaBeans.clear();
                     mediaBeans.add(resultEvent.getResult());
                     selectImgRecyclerAdapter.notifyDataSetChanged();
                     if (selectImgListener != null) {
@@ -164,7 +159,8 @@ public class SelectImgRecyclerView extends LinearLayout implements RecyclerView.
                     }
                 }
             });
-        if (position == mediaBeans.size()) {
+        }
+        if (position == mediaBeans.size() || (position == 0 && maxCount == 1)) {
             rxGalleryFinal.openGallery();
         } else {
             rxGalleryFinal.openGallery(position);
