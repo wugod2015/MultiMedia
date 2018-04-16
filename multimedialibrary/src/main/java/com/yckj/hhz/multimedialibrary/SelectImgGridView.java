@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -163,6 +164,20 @@ public class SelectImgGridView extends LinearLayout implements SelectImgAdapter.
         List<String> pathList = new ArrayList<>();
         for (MediaBean item : mediaBeans) {
             pathList.add(item.getOriginalPath());
+        }
+        return pathList;
+    }
+
+    /**
+     * 获取选择的图片文件
+     *
+     * @return
+     */
+    public List<File> getSelectedFileList() {
+        List<File> pathList = new ArrayList<>();
+        for (MediaBean item : mediaBeans) {
+            File file = new File(item.getOriginalPath());
+            pathList.add(file);
         }
         return pathList;
     }

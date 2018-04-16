@@ -26,12 +26,14 @@ public class SelectImgRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
     int spanCount;
     int maxCount;
     boolean isShowDelete = false;
+    boolean isOnlyShow = false;
 
-    public SelectImgRecyclerAdapter(Context context, List<MediaBean> list, int spanCount, int maxCount) {
+    public SelectImgRecyclerAdapter(Context context, List<MediaBean> list, int spanCount, int maxCount, boolean isOnlyShow) {
         this.context = context;
         this.list = list;
         this.spanCount = spanCount;
         this.maxCount = maxCount;
+        this.isOnlyShow = isOnlyShow;
     }
 
     @Override
@@ -79,7 +81,7 @@ public class SelectImgRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
 
     @Override
     public int getItemCount() {
-        return list.size() < maxCount ? list.size() + 1 : list.size();
+        return list.size() < maxCount && !isOnlyShow ? list.size() + 1 : list.size();
     }
 
     public static interface OnRecyclerViewItemClickListener {

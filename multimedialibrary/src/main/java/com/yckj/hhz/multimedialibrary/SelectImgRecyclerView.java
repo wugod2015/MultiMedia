@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,6 +42,7 @@ public class SelectImgRecyclerView extends LinearLayout implements RecyclerView.
     int spanCount = 4;
     int maxCount = 1;
     boolean isCrop = false;
+    boolean isOnlyShow = false;
 
     public SelectImgRecyclerView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
@@ -68,14 +70,11 @@ public class SelectImgRecyclerView extends LinearLayout implements RecyclerView.
         mediaBeans = new ArrayList<>();
         maxCount = maxCount == 0 ? spanCount * spanCount : maxCount;
 
-        selectImgRecyclerAdapter = new SelectImgRecyclerAdapter(context, mediaBeans, spanCount, maxCount);
-        recyclerView.setAdapter(selectImgRecyclerAdapter);
-        selectImgRecyclerAdapter.setOnRecyclerViewItemClickListener(this);
         setSelectImgView();
     }
 
     public void setSelectImgView() {
-        selectImgRecyclerAdapter = new SelectImgRecyclerAdapter(context, mediaBeans, spanCount, maxCount);
+        selectImgRecyclerAdapter = new SelectImgRecyclerAdapter(context, mediaBeans, spanCount, maxCount, isOnlyShow);
         recyclerView.setAdapter(selectImgRecyclerAdapter);
         selectImgRecyclerAdapter.setOnRecyclerViewItemClickListener(this);
     }
@@ -171,6 +170,25 @@ public class SelectImgRecyclerView extends LinearLayout implements RecyclerView.
     }
 
     /**
+     * 设置已选择的图片地址
+     *
+     * @param pathList
+     */
+    public void setSelectedPathList(List<String> pathList, boolean isOnlyShow) {
+        this.isOnlyShow = isOnlyShow;
+
+        mediaBeans.clear();
+        if (pathList != null) {
+            for (String path : pathList) {
+                MediaBean item = new MediaBean();
+                item.setOriginalPath(path);
+                mediaBeans.add(item);
+            }
+        }
+        setSelectImgView();
+    }
+
+    /**
      * 获取选择的图片地址
      *
      * @return
@@ -179,6 +197,20 @@ public class SelectImgRecyclerView extends LinearLayout implements RecyclerView.
         List<String> pathList = new ArrayList<>();
         for (MediaBean item : mediaBeans) {
             pathList.add(item.getOriginalPath());
+        }
+        return pathList;
+    }
+
+    /**
+     * 获取选择的图片文件
+     *
+     * @return
+     */
+    public List<File> getSelectedFileList() {
+        List<File> pathList = new ArrayList<>();
+        for (MediaBean item : mediaBeans) {
+            File file = new File(item.getOriginalPath());
+            pathList.add(file);
         }
         return pathList;
     }
