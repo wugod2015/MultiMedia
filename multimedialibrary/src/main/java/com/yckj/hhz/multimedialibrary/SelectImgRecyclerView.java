@@ -1,6 +1,7 @@
 package com.yckj.hhz.multimedialibrary;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.TypedArray;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -158,6 +159,12 @@ public class SelectImgRecyclerView extends LinearLayout implements RecyclerView.
                     }
                 }
             });
+        }
+        if (isOnlyShow) {
+            Intent intent = new Intent(context, ShowBigImgActivity.class);
+            intent.putExtra("MediaBean", mediaBeans.get(position));
+            context.startActivity(intent);
+            return;
         }
         if (position == mediaBeans.size() || (position == 0 && maxCount == 1)) {
             rxGalleryFinal.openGallery();
