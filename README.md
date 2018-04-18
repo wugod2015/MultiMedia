@@ -2,7 +2,7 @@
 ##简单在xml中引用控件即可实现
 在前辈（[RxGalleryFinal](https://github.com/FinalTeam/RxGalleryFinal)）的基础上加了简单封装，保留了原有功能
 ## 效果展示
-![](https://github.com/wugod2015/ListLib/raw/master/art/Screenshot1.png)
+![](https://github.com/wugod2015/MultiMedia/raw/master/art/Screenshot1.png)
 ### 引用multimedialibrary
 直接引用multimedialibrary module源码，或者引用build/outputs下multimedialibrary-release.aar包
 ### 调用方式
