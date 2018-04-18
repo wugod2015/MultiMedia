@@ -14,13 +14,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:is_crop="true"
+            android:visibility="gone"
             app:span_count="4">
 
         </com.yckj.hhz.multimedialibrary.SelectImgGridView>
 
         <com.yckj.hhz.multimedialibrary.SelectImgRecyclerView
+            android:id="@+id/selectImgRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:is_crop="true"></com.yckj.hhz.multimedialibrary.SelectImgRecyclerView>
+            app:is_crop="true"
+            app:max_count="12"
+            app:span_count="4"></com.yckj.hhz.multimedialibrary.SelectImgRecyclerView>
     </LinearLayout>
 </ScrollView>
