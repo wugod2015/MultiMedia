@@ -37,3 +37,9 @@ selectImgGridView.setSelectImgListener(new SelectImgGridView.SelectImgListener()
             }
         });
 ```
+<center>
+Android学习交流群：523487222<br>
+（如果您觉得有用，欢迎加入，一起学习进步）<br>
+点击链接加入群【Android学习群】<br>
+![](https://github.com/wugod2015/MultiMedia/raw/master/art/erweima.png)
+</center >
