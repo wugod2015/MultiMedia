@@ -412,7 +412,10 @@ public class MediaGridFragment extends BaseFragment implements MediaGridView, Re
             String filename = String.format(IMAGE_STORE_FILE_NAME, dateFormat.format(new Date()));
             mImagePath = new File(mImageStoreDir, filename).getAbsolutePath();
             String packageName = getActivity().getPackageName();
-            captureIntent.putExtra(MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(getActivity(), packageName + ".provider", new File(mImagePath)));  //Uri.fromFile(new File(mImagePath)));
+            if (android.os.Build.VERSION.SDK_INT < 24)
+                captureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(mImagePath)));
+            else
+                captureIntent.putExtra(MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(getActivity(), packageName + ".provider", new File(mImagePath)));  //Uri.fromFile(new File(mImagePath)));
             startActivityForResult(captureIntent, TAKE_IMAGE_REQUEST_CODE);
         } else {
             Toast.makeText(getContext(), R.string.gallery_device_camera_unable, Toast.LENGTH_SHORT).show();
